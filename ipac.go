@@ -226,7 +226,7 @@ func clean(o *Ipac) {
 			}
 
 			// delete the ip
-			(*o).Ips = append((*o).Ips[i:], (*o).Ips[:i+1]...)
+			(*o).Ips = append((*o).Ips[:i], (*o).Ips[i+1:]...)
 
 		} else {
 
@@ -265,7 +265,7 @@ func clean(o *Ipac) {
 				// unblock this subnet group
 				ipv6_modify_subnet_block_os(o, false, (*o).Ipv6Subnets[i].Group)
 				// delete it
-				(*o).Ipv6Subnets = append((*o).Ipv6Subnets[i:], (*o).Ipv6Subnets[:i+1]...)
+				(*o).Ipv6Subnets = append((*o).Ipv6Subnets[:i], (*o).Ipv6Subnets[i+1:]...)
 			} else {
 				// increment the blocked subnet count for this clean loop iteration
 				cblocked_subnet += 1
