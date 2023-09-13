@@ -357,6 +357,52 @@ func ipv6_get_ranked_groups(o *Ipac, addr string) []string {
 
 	var groups = strings.Split(addr, ":")
 
+	// make full length IPv6 address
+
+	// an address with repeating 0000 groups can replace the series of repeating groups with :: once
+	// Original: 2041:0000:140F:0000:0000:0000:875B:131B (8)
+	// Short: 2041:0000:140F::875B:131B (6)
+	for g := range(groups) {
+		if (len(groups[g]) == 0) {
+			// set the empty group to 0000
+			groups[g] = "0000"
+			// get the number of new zero groups
+			var number_of_new_zero_groups = 8-len(groups)
+			// add the new groups
+			for p := 0; p < number_of_new_zero_groups; p++ {
+				// var l = []string{"a", "b", "c"}
+				// l = append(l[:1+1], l[1:]...)
+				// l[1+1] = "abc"
+				groups = append(groups[:g+1], groups[g:]...)
+				groups[g+1] = "0000"
+			}
+			break
+		}
+	}
+
+	// one group of 4 zeroes can be replaced with only a 0
+	// Short: 2041:0000:140F::875B:131B
+	// Shorter: 2041:0:140F::875B:131B
+	for g := range(groups) {
+		if (groups[g] == "0") {
+			groups[g] = "0000"
+		}
+	}
+
+	// leading zeroes in each group can also be removed
+	// Original: 2001:0001:0002:0003:0004:0005:0006:0007
+	// Short: 2001:1:2:3:4:5:6:7
+	for g := range(groups) {
+		if (len(groups[g]) < 4) {
+			var number_of_prefix_zeroes = 4-len(groups[g])
+			var prefix = ""
+			for p := 0; p < number_of_prefix_zeroes; p++ {
+				prefix += "0"
+			}
+			groups[g] = prefix + groups[g]
+		}
+	}
+
 	var ranked_groups []string
 
 	for g := 0; g < 8-(*o).BlockIpv6SubnetsGroupDepth; g++ {
