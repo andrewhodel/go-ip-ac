@@ -135,6 +135,8 @@ ip_ac.WarnCount
 ip_ac.BlockedSubnetCount
 ```
 
+If you want to read each of the IP addresses, use `.Lock()` and `.Unlock()` of the `Ipac` struct usually named `o` that you set the options with.
+
 ## firewall support
 
 In this module there exists support for `iptables` on Linux.

@@ -66,9 +66,8 @@ type Ipac struct {
 	BlockedSubnetCount		int
 	ModuleDirectory			string
 	NeverBlock			bool
+	sync.Mutex
 }
-
-var ipac_mutex = &sync.Mutex{}
 
 func comm(o *Ipac, s string) (string, string) {
 
@@ -183,7 +182,7 @@ func clean(o *Ipac) {
 	var cwarn = 0
 	var cblocked_subnet = 0
 
-	ipac_mutex.Lock()
+	(*o).Lock()
 
 	// show all the Ipac data
 	//fmt.Println("clean() iteration", "number of Ips", len((*o).Ips), o)
@@ -199,7 +198,7 @@ func clean(o *Ipac) {
 		(*o).Purge = false
 
 		// unlock the mutex
-		ipac_mutex.Unlock()
+		(*o).Unlock()
 
 		//fmt.Println("Purge completed")
 
@@ -337,7 +336,7 @@ func clean(o *Ipac) {
 
 	}
 
-	ipac_mutex.Unlock()
+	(*o).Unlock()
 
 	go clean(o)
 
@@ -499,7 +498,7 @@ func IpDetails(o *Ipac, addr string) (Ip) {
 
 	var i Ip
 
-	ipac_mutex.Lock()
+	(*o).Lock()
 
 	for l := range (*o).Ips {
 		if ((*o).Ips[l].Addr == addr) {
@@ -508,7 +507,7 @@ func IpDetails(o *Ipac, addr string) (Ip) {
 		}
 	}
 
-	ipac_mutex.Unlock()
+	(*o).Unlock()
 
 	return i
 
@@ -637,22 +636,22 @@ func TestIpAllowed(o *Ipac, addr string) (bool) {
 		}
 
 		// update the (*o).Ips table
-		ipac_mutex.Lock()
+		(*o).Lock()
 		for l := range (*o).Ips {
 			if ((*o).Ips[l].Addr == addr) {
 				(*o).Ips[l] = entry
 				break
 			}
 		}
-		ipac_mutex.Unlock()
+		(*o).Unlock()
 
 	} else {
 
 		// this ip address is new
 		entry.Addr = addr
-		ipac_mutex.Lock()
+		(*o).Lock()
 		(*o).Ips = append((*o).Ips, entry)
-		ipac_mutex.Unlock()
+		(*o).Unlock()
 		//fmt.Println("ipac.TestIpAllowed, new ip added", len((*o).Ips), entry)
 
 	}
@@ -734,7 +733,7 @@ func ModifyAuth(o *Ipac, authed int, addr string) {
 	// set the last auth time of the ip
 	entry.LastAuth = now
 
-	ipac_mutex.Lock()
+	(*o).Lock()
 
 	// update the (*o).Ips table
 	for l := range (*o).Ips {
@@ -744,7 +743,7 @@ func ModifyAuth(o *Ipac, authed int, addr string) {
 		}
 	}
 
-	ipac_mutex.Unlock()
+	(*o).Unlock()
 
 	return
 
