@@ -1,10 +1,9 @@
 ## installation
 
 ```
-GO111MODULE=off go get github.com/andrewhodel/go-ip-ac
+cd go/src
+git clone github.com/andrewhodel/go-ip-ac
 ```
-
-Run your Go program with `GO111MODULE=off go run program.go`
 
 ## usage
 

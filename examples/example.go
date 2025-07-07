@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/andrewhodel/go-ip-ac"
+	"go-ip-ac"
 	"fmt"
 )
 
