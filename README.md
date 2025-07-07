@@ -84,10 +84,6 @@ o.BlockAfterUnauthedAttempts = 30
 // failed authorization attempts after the IP has been authorized
 o.NotifyAfterAbsurdAuthAttempts = 20
 
-// IP addresses were blocked
-// IP addresses exceeded the o.NotifyAfterAbsurdAuthAttempts limit
-// IPv6 subnet was blocked
-
 // event notification closure
 o.NotifyClosure = func(event string, info string, ips []string) {
 
