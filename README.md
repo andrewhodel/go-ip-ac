@@ -12,15 +12,6 @@ Run `examples/example.go`
 ```go
 var ip_ac ipac.Ipac
 
-// notify closure, use to send firewall notifications to admins
-ip_ac.NotifyClosure = func(message_id int, info string, ips []string) {
-
-    // message_id is an int specifying the message id
-	// info is a string about the event
-	// ips is a list of ip addresses related to the event
-
-}
-
 ipac.Init(&ip_ac)
 
 // set authorization status of an IP
@@ -97,11 +88,10 @@ o.NotifyAfterAbsurdAuthAttempts = 20
 // IP addresses exceeded the o.NotifyAfterAbsurdAuthAttempts limit
 // IPv6 subnet was blocked
 
-// set to a function to receive firewall events and ip information
-// leave as nil to not receive this information
-o.NotifyClosure = func(message_id int, info string, ips []string) {
+// event notification closure
+o.NotifyClosure = func(event string, info string, ips []string) {
 
-    // message_id is an int specifying the message id
+	// event is a string of ips_blocked, ips_exceeded_absurd_auth_attempts or subnet_blocked
 	// info is a string about the event
 	// ips is a list of ip addresses related to the event
 
