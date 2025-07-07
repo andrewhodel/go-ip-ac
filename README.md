@@ -1,7 +1,5 @@
 ## installation
 
-**Requires** this Go Module to be in `$HOME/go/src/github.com/andrewhodel/go-ip-ac` to work with `iptables` unless you set the `ModuleDirectory` option.
-
 ```
 GO111MODULE=off go get github.com/andrewhodel/go-ip-ac
 ```
@@ -110,9 +108,6 @@ o.NotifyClosure = func(message_id int, info string, ips []string) {
 
 }
 
-// go-ip-ac module path (required if not in $HOME/go
-o.ModuleDirectory = "/path/to/module"
-
 // enable/disable the firewall
 o.NeverBlock = false
 ```
@@ -139,7 +134,7 @@ If you want to read each of the IP addresses, use `.Lock()` and `.Unlock()` of t
 
 ## firewall support
 
-In this module there exists support for `iptables` on Linux.
+In this module there exists support for `iptables` and `ip6tables` in Linux.
 
 There is structure for supporting any OS and firewall that Go supports.
 

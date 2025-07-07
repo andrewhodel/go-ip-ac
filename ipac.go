@@ -10,7 +10,6 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 package ipac
 
 import (
-	"os"
 	"os/exec"
 	"bytes"
 	"time"
@@ -64,28 +63,15 @@ type Ipac struct {
 	BlockedCount			int
 	WarnCount			int
 	BlockedSubnetCount		int
-	ModuleDirectory			string
 	NeverBlock			bool
 	sync.Mutex
 }
 
-func comm(o *Ipac, s string) (string, string) {
+func comm(o *Ipac, command string, args ...string) (string, string) {
 
-	// the command.sh file is required
-	var module_directory = ""
-	if ((*o).ModuleDirectory != "") {
-		// use the configured module directory
-		module_directory = (*o).ModuleDirectory
-	} else {
-		// use the home directory and go 111 module path
-		module_directory = os.Getenv("HOME") + "/go/src/github.com/andrewhodel/go-ip-ac/"
-	}
+	// use a variadic function and return stdout and stderr
 
-	if (module_directory[len(module_directory)-1] != '/') {
-		module_directory += "/"
-	}
-
-	cmd := exec.Command(module_directory + "command.sh", s)
+	cmd := exec.Command(command, args...)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -106,26 +92,36 @@ func Init(o *Ipac) {
 	if (runtime.GOOS == "linux") {
 
 		// first flush the goipac chain
-		comm(o, "sudo iptables -F goipac")
+		args := []string{"iptables", "-F", "goipac"}
+		comm(o, "sudo", args...)
 		// then delete the chain
-		comm(o, "sudo iptables -X goipac")
+		args = []string{"iptables", "-X", "goipac"}
+		comm(o, "sudo", args...)
 		// then add the chain
-		comm(o, "sudo iptables -N goipac")
+		args = []string{"iptables", "-N", "goipac"}
+		comm(o, "sudo", args...)
 		// delete the rule to the chain to input
-		comm(o, "sudo iptables -D INPUT -j goipac")
+		args = []string{"iptables", "-D", "INPUT", "-j", "goipac"}
+		comm(o, "sudo", args...)
 		// then add the rule to the chain to input
-		comm(o, "sudo iptables -A INPUT -j goipac")
+		args = []string{"iptables", "-A", "INPUT", "-j", "goipac"}
+		comm(o, "sudo", args...)
 
 		// first flush the goipac chain
-		comm(o, "sudo ip6tables -F goipac")
+		args = []string{"ip6tables", "-F", "goipac"}
+		comm(o, "sudo", args...)
 		// then delete the chain
-		comm(o, "sudo ip6tables -X goipac")
+		args = []string{"ip6tables", "-X", "goipac"}
+		comm(o, "sudo", args...)
 		// then add the chain
-		comm(o, "sudo ip6tables -N goipac")
+		args = []string{"ip6tables", "-N", "goipac"}
+		comm(o, "sudo", args...)
 		// delete the rule to the chain to input
-		comm(o, "sudo ip6tables -D INPUT -j goipac")
+		args = []string{"ip6tables", "-D", "INPUT", "-j", "goipac"}
+		comm(o, "sudo", args...)
 		// then add the rule to the chain to input
-		comm(o, "sudo ip6tables -A INPUT -j goipac")
+		args = []string{"ip6tables", "-A", "INPUT", "-j", "goipac"}
+		comm(o, "sudo", args...)
 
 	}
 
@@ -450,14 +446,16 @@ func ipv6_modify_subnet_block_os(o *Ipac, block bool, subnet string) {
 
 		// block the ip address
 		if (runtime.GOOS == "linux") {
-			comm(o, "sudo ip6tables -I goipac -s " + iptables_subnet_string + " -j DROP")
+			args := []string{"ip6tables", "-I", "goipac", "-s", iptables_subnet_string, "-j", "DROP"}
+			comm(o, "sudo", args...)
 		}
 
 	} else {
 
 		// unblock the ip address
 		if (runtime.GOOS == "linux") {
-			comm(o, "sudo ip6tables -D goipac -s " + iptables_subnet_string + " -j DROP")
+			args := []string{"ip6tables", "-D", "goipac", "-s", iptables_subnet_string, "-j", "DROP"}
+			comm(o, "sudo", args...)
 		}
 
 	}
@@ -473,9 +471,11 @@ func modify_ip_block_os(o *Ipac, block bool, i Ip) {
 		// block the ip address
 		if (runtime.GOOS == "linux") {
 			if (strings.Index(i.Addr, ":") > -1) {
-				comm(o, "sudo ip6tables -I goipac -s " + i.Addr + " -j DROP")
+				args := []string{"ip6tables", "-I", "goipac", "-s", i.Addr, "-j", "DROP"}
+				comm(o, "sudo", args...)
 			} else {
-				comm(o, "sudo iptables -I goipac -s " + i.Addr + " -j DROP")
+				args := []string{"iptables", "-I", "goipac", "-s", i.Addr, "-j", "DROP"}
+				comm(o, "sudo", args...)
 			}
 		}
 
@@ -484,9 +484,11 @@ func modify_ip_block_os(o *Ipac, block bool, i Ip) {
 		// unblock the ip address
 		if (runtime.GOOS == "linux") {
 			if (strings.Index(i.Addr, ":") > -1) {
-				comm(o, "sudo ip6tables -D goipac -s " + i.Addr + " -j DROP")
+				args := []string{"ip6tables", "-D", "goipac", "-s", i.Addr, "-j", "DROP"}
+				comm(o, "sudo", args...)
 			} else {
-				comm(o, "sudo iptables -D goipac -s " + i.Addr + " -j DROP")
+				args := []string{"iptables", "-D", "goipac", "-s", i.Addr, "-j", "DROP"}
+				comm(o, "sudo", args...)
 			}
 		}
 
@@ -671,8 +673,10 @@ func Purge(o *Ipac) {
 
 	if (runtime.GOOS == "linux") {
 		// flush the goipac chain
-		comm(o, "sudo iptables -F goipac")
-		comm(o, "sudo ip6tables -F goipac")
+		args := []string{"iptables", "-F", "goipac"}
+		comm(o, "sudo", args...)
+		args = []string{"ip6tables", "-F", "goipac"}
+		comm(o, "sudo", args...)
 	}
 
 }
