@@ -26,9 +26,9 @@ type Ip struct {
 	Authed				bool
 	Warn				bool
 	Blocked				bool
-	LastAccess			int
-	OriginalAccess			int
-	LastAuth			int
+	LastAccess			time.Time
+	OriginalAccess			time.Time
+	LastAuth			time.Time
 	UnauthedNewConnections		int
 	UnauthedAttempts		int
 	AbsurdAuthAttempts		int
@@ -37,7 +37,7 @@ type Ip struct {
 type Ipv6Subnet struct {
 	Group				string
 	IpBans				int
-	BlockedTs			int
+	BlockedTs			time.Time
 }
 
 type notify_func func(int, string, []string)
@@ -54,8 +54,8 @@ type Ipac struct {
 	NotifyAfterAbsurdAuthAttempts	int
 	NotifyClosure			notify_func
 	Purge				bool
-	LastCleanup			int
-	LastNotifyAbsurd		int
+	LastCleanup			time.Time
+	LastNotifyAbsurd		time.Time
 	NextNotifyBlockedIps		[]string
 	NextNotifyAbsurdIps		[]string
 	Ips				[]Ip
@@ -158,8 +158,7 @@ func Init(o *Ipac) {
 
 	//fmt.Printf("default options: %+v\n", o)
 
-	(*o).LastCleanup = int(time.Now().Unix())
-	(*o).LastNotifyAbsurd = int(time.Now().Unix()) - (*o).BlockForSeconds
+	(*o).LastCleanup = time.Now()
 
 	go clean(o)
 
@@ -170,7 +169,7 @@ func clean(o *Ipac) {
 	time.Sleep(time.Duration((*o).CleanupLoopSeconds) * time.Second)
 
 	// consider the time since the last interval
-	var seconds_since_last_cleanup = int(time.Now().Unix()) - (*o).LastCleanup
+	var seconds_since_last_cleanup = int(time.Now().Sub((*o).LastCleanup).Seconds())
 
 	var expire_older_than = (*o).BlockForSeconds - seconds_since_last_cleanup
 
@@ -212,7 +211,7 @@ func clean(o *Ipac) {
 
 		var entry = (*o).Ips[i]
 
-		var age_of_ip = int(time.Now().Unix()) - entry.OriginalAccess
+		var age_of_ip = int(time.Now().Sub(entry.OriginalAccess).Seconds())
 
 		if (age_of_ip > expire_older_than) {
 
@@ -245,17 +244,17 @@ func clean(o *Ipac) {
 	(*o).WarnCount = cwarn
 
 	// update the last cleanup
-	(*o).LastCleanup = int(time.Now().Unix())
+	(*o).LastCleanup = time.Now()
 
 	// handle subnet group bans
 	for i := len((*o).Ipv6Subnets)-1; i >= 0; i-- {
 
-		if ((*o).Ipv6Subnets[i].BlockedTs == 0) {
+		if ((*o).Ipv6Subnets[i].BlockedTs.IsZero() == true) {
 
 			// this subnet group is blocked
 			// test if the block should expire
 
-			var age_of_ban = int(time.Now().Unix()) - (*o).Ipv6Subnets[i].BlockedTs
+			var age_of_ban = int(time.Now().Sub((*o).Ipv6Subnets[i].BlockedTs).Seconds())
 
 			if (age_of_ban > expire_older_than) {
 				// unblock this subnet group
@@ -287,7 +286,7 @@ func clean(o *Ipac) {
 			// this subnet group has breached the limit
 			// block it
 			ipv6_modify_subnet_block_os(o, false, (*o).Ipv6Subnets[i].Group)
-			(*o).Ipv6Subnets[i].BlockedTs = int(time.Now().Unix())
+			(*o).Ipv6Subnets[i].BlockedTs = time.Now()
 
 			// increment the blocked subnet count
 			cblocked_subnet += 1
@@ -318,7 +317,7 @@ func clean(o *Ipac) {
 
 		}
 
-		if (len((*o).NextNotifyAbsurdIps) > 0 && (*o).LastNotifyAbsurd < int(time.Now().Unix()) - (*o).BlockForSeconds) {
+		if (len((*o).NextNotifyAbsurdIps) > 0 && (*o).LastNotifyAbsurd.Before(time.Now().Add(-time.Duration((*o).BlockForSeconds) * time.Second)) == true) {
 
 			// send notification
 			go (*o).NotifyClosure(1, "Too many failed login attempts from IP Addresses that are already authenticated.", (*o).NextNotifyAbsurdIps)
@@ -327,7 +326,7 @@ func clean(o *Ipac) {
 			(*o).NextNotifyAbsurdIps = nil
 
 			// set last notify absurd timestamp
-			(*o).LastNotifyAbsurd = int(time.Now().Unix())
+			(*o).LastNotifyAbsurd = time.Now()
 
 		}
 
@@ -545,11 +544,11 @@ func TestIpAllowed(o *Ipac, addr string) (bool) {
 	}
 
 	// set the last access time of the ip
-	entry.LastAccess = int(time.Now().Unix())
+	entry.LastAccess = time.Now()
 
-	if (entry.OriginalAccess == 0) {
+	if (entry.OriginalAccess.IsZero() == true) {
 		// set the original access time of the ip
-		entry.OriginalAccess = int(time.Now().Unix())
+		entry.OriginalAccess = time.Now()
 	}
 
 	if (entry.Addr == addr) {
@@ -696,7 +695,7 @@ func ModifyAuth(o *Ipac, authed string, addr string) {
 	// get the ip entry
 	var entry = IpDetails(o, addr)
 
-	var now = int(time.Now().Unix())
+	var now = time.Now()
 
 	if (entry.Authed == true && authed == "invalid_login") {
 
