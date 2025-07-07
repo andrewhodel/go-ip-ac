@@ -23,7 +23,7 @@ ip_ac.NotifyClosure = func(message_id int, info string, ips []string) {
 
 ipac.Init(&ip_ac)
 
-// set authorization status for an IP
+// set authorization status of an IP
 // logout
 ipac.ModifyAuth(&ip_ac, "logout", "127.0.0.1")
 // invalid login credentials
@@ -31,7 +31,7 @@ ipac.ModifyAuth(&ip_ac, "invalid_login", "127.0.0.1")
 // authorized (valid login credentials)
 ipac.ModifyAuth(&ip_ac, "valid_login", "127.0.0.1")
 
-// test authorization status for an IP
+// test authorization status of an IP
 // this needs to be called every time there is a new IP connection
 var status = ipac.TestIpAllowed(&ip_ac, "127.0.0.1")
 fmt.Printf("TestIpAllowed 127.0.0.1: %t\n", status)
@@ -40,7 +40,7 @@ fmt.Printf("TestIpAllowed 127.0.0.1: %t\n", status)
 var warn = ipac.TestIpWarn(&ip_ac, "127.0.0.1")
 fmt.Printf("TestIpWarn 127.0.0.1: %t\n", warn)
 
-// return details for a specific ip address
+// return details of a specific ip address
 var ip_details = ipac.IpDetails(&ip_ac, "127.0.0.1")
 fmt.Printf("IpDetails 127.0.0.1: %+v\n", ip_details)
 ```
@@ -78,7 +78,7 @@ o.BlockIpv6SubnetsBreach = 40
 
 // warn after N unauthorized new connections
 // requests from these IP addresses should
-// display a denial of service warning for the IP
+// display a denial of service warning to the IP
 // in the user interface
 o.WarnAfterNewConnections = 80
 
@@ -133,11 +133,11 @@ If you want to read each of the IP addresses, use `.Lock()` and `.Unlock()` of t
 
 ## firewall support
 
-In this module there exists support for `iptables` and `ip6tables` in Linux.
+In this module there exists support of `iptables` and `ip6tables` in Linux.
 
-There is structure for supporting any OS and firewall that Go supports.
+There is structure to support any OS and firewall that Go supports.
 
-There is also structure for supporting API calls to network or hosting providers, like AWS.
+There is also structure to support API calls to network or hosting providers, like AWS.
 
 ## license
 
