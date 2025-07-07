@@ -130,7 +130,7 @@ func Init(o *Ipac) {
 		(*o).CleanupLoopSeconds = 60
 	}
 	if ((*o).BlockForSeconds == 0) {
-		(*o).BlockForSeconds = 60 * 60 * 24
+		(*o).BlockForSeconds = 60 * 60
 	}
 	if ((*o).BlockIpv6SubnetsGroupDepth == 0) {
 		(*o).BlockIpv6SubnetsGroupDepth = 4

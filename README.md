@@ -57,7 +57,7 @@ Set these in the object {} passed as the first argument to `ipac.Init()` if you 
 o.CleanupLoopSeconds = 60
 
 // how many seconds to ban/block entities for
-o.BlockForSeconds = 60 * 60 * 24
+o.BlockForSeconds = 60 * 60
 
 // maximum depth to classify IPv6 is
 // 64 bits of a network prefix and 64 bits of an interface identifier
