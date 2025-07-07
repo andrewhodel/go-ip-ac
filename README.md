@@ -9,7 +9,7 @@ git clone github.com/andrewhodel/go-ip-ac
 
 Run `examples/example.go`
 
-```
+```go
 var ip_ac ipac.Ipac
 
 // notify closure, use to send firewall notifications to admins
@@ -49,7 +49,7 @@ fmt.Printf("IpDetails 127.0.0.1: %+v\n", ip_details)
 
 Set these in the object {} passed as the first argument to `ipac.Init()` if you want to change the defaults shown here.
 
-```
+```go
 // default configurable options
 
 // how many seconds between each iteration of the cleanup loop
@@ -115,7 +115,7 @@ o.NeverBlock = false
 
 You may want the total counts.
 
-```
+```go
 // count of IP Addresses that have connected in the last ip_ac.block_for_seconds
 ip_ac.TotalCount
 
