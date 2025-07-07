@@ -13,7 +13,8 @@ import (
 	"os/exec"
 	"bytes"
 	"time"
-	//"fmt"
+	"fmt"
+	"os"
 	"runtime"
 	"sync"
 	"strings"
@@ -681,7 +682,7 @@ func Purge(o *Ipac) {
 
 }
 
-func ModifyAuth(o *Ipac, authed int, addr string) {
+func ModifyAuth(o *Ipac, authed string, addr string) {
 
 	if ((*o).Purge == true) {
 		// do not allow modification while purging
@@ -697,7 +698,7 @@ func ModifyAuth(o *Ipac, authed int, addr string) {
 
 	var now = int(time.Now().Unix())
 
-	if (entry.Authed == true && authed == 1) {
+	if (entry.Authed == true && authed == "invalid_login") {
 
 		// an IP address is authorized but invalid authorizations are happening from the IP
 		// perhaps someone else at the location is abusing the authed IP address and trying to guess
@@ -711,7 +712,7 @@ func ModifyAuth(o *Ipac, authed int, addr string) {
 
 		entry.AbsurdAuthAttempts += 1
 
-	} else if (authed == 2) {
+	} else if (authed == "valid_login") {
 
 		// authorized
 
@@ -720,17 +721,22 @@ func ModifyAuth(o *Ipac, authed int, addr string) {
 		entry.Warn = false
 		entry.Authed = true
 
-	} else if (authed == 1) {
+	} else if (authed == "invalid_login") {
 
 		// not authorized, not expired
 
 		// increment the invalid authorization attempts counter for this IP address
 		entry.UnauthedAttempts += 1
 
-	} else if (authed == 0) {
+	} else if (authed == "logout") {
 
 		// valid logout
 		entry.Authed = false
+
+	} else {
+
+		fmt.Println("ipac.ModifyAuth called with invalid authed string.  Only logout, invalid_login and valid_login are allowed.")
+		os.Exit(1)
 
 	}
 

@@ -22,11 +22,11 @@ func main() {
 
 	// set authorization status for an IP
 	// logout
-	ipac.ModifyAuth(&ip_ac, 0, "127.0.0.1")
+	ipac.ModifyAuth(&ip_ac, "logout", "127.0.0.1")
 	// invalid login credentials
-	ipac.ModifyAuth(&ip_ac, 1, "127.0.0.1")
+	ipac.ModifyAuth(&ip_ac, "invalid_login", "127.0.0.1")
 	// authorized (valid login credentials)
-	ipac.ModifyAuth(&ip_ac, 2, "127.0.0.1")
+	ipac.ModifyAuth(&ip_ac, "valid_login", "127.0.0.1")
 
 	// test authorization status for an IP
 	// this needs to be called every time there is a new IP connection
