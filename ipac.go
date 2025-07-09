@@ -523,6 +523,8 @@ func TestIpWarn(o *Ipac, addr string) (bool) {
 
 func TestIpAllowed(o *Ipac, addr string) (bool) {
 
+	// this must be called every time there is a new IP connection, it accounts for the number of connections
+
 	// returns false if the IP address has made too many unauthenticated requests and is not allowed
 	// returns true if the connection is allowed
 
