@@ -262,7 +262,7 @@ func clean(o *Ipac) {
 				// delete it
 				(*o).Ipv6Subnets = append((*o).Ipv6Subnets[:i], (*o).Ipv6Subnets[i+1:]...)
 			} else {
-				// increment the blocked subnet count for this clean loop iteration
+				// increment the blocked subnet count of this clean loop iteration
 				cblocked_subnet += 1
 			}
 
@@ -572,7 +572,9 @@ func TestIpAllowed(o *Ipac, addr string) (bool) {
 
 		// block this ip address if it has made too many unauthed connections
 		// or invalid authorization attempts
-		if ((entry.UnauthedNewConnections >= (*o).BlockAfterNewConnections || entry.UnauthedAttempts >= (*o).BlockAfterUnauthedAttempts) && entry.Blocked == false) {
+		if ((entry.UnauthedNewConnections >= (*o).BlockAfterNewConnections || entry.UnauthedAttempts >= (*o).BlockAfterUnauthedAttempts) && entry.Blocked == false && entry.Authed == false) {
+
+			// IP address is not authed
 
 			// set the ip address to be blocked
 			entry.Blocked = true
@@ -725,7 +727,7 @@ func ModifyAuth(o *Ipac, authed string, addr string) {
 
 		// not authorized, not expired
 
-		// increment the invalid authorization attempts counter for this IP address
+		// increment the invalid authorization attempts counter of this IP address
 		entry.UnauthedAttempts += 1
 
 	} else if (authed == "logout") {
