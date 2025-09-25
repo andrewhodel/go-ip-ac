@@ -734,6 +734,9 @@ func ModifyAuth(o *Ipac, authed string, addr string) {
 
 		// valid logout
 		entry.Authed = false
+		entry.UnauthedNewConnections = 0
+		entry.UnauthedAttempts = 0
+		entry.AbsurdAuthAttempts = 0
 
 	} else {
 
