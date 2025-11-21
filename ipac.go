@@ -723,6 +723,9 @@ func ModifyAuth(o *Ipac, authed string, addr string) {
 		entry.Warn = false
 		entry.Authed = true
 
+		entry.UnauthedNewConnections = 0
+		entry.UnauthedAttempts = 0
+
 	} else if (authed == "invalid_login") {
 
 		// not authorized, not expired
@@ -734,6 +737,7 @@ func ModifyAuth(o *Ipac, authed string, addr string) {
 
 		// valid logout
 		entry.Authed = false
+
 		entry.UnauthedNewConnections = 0
 		entry.UnauthedAttempts = 0
 		entry.AbsurdAuthAttempts = 0
