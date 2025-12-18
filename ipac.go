@@ -77,7 +77,11 @@ func comm(o *Ipac, command string, args ...string) (string, string) {
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
-	_ = cmd.Run()
+	err := cmd.Run()
+
+	if (err != nil) {
+		return "", err.Error()
+	}
 
 	if (len(stderr.String()) > 0) {
 		fmt.Printf("go-ip-ac OS command `%s` stderr: %s\n", command, stderr.String())
